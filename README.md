@@ -43,6 +43,14 @@ About $0 at portfolio traffic. Lambda and DynamoDB fall within AWS always-free l
 
 All within AWS always-free limits. Alarm notifications are tested with `aws cloudwatch set-alarm-state`.
 
+**Live dashboard** (real portfolio traffic, all alarms OK):
+
+![CloudWatch dashboard](docs/images/dashboard.png)
+
+**Alarm test** (OK -> ALARM, delivered by SNS within a minute, then auto-recovered to OK):
+
+![Alarm email](docs/images/alarm-email.png)
+
 ## CI/CD
 
 Every change is deployed by **GitHub Actions** using **OIDC** (temporary AWS credentials, no stored keys):
