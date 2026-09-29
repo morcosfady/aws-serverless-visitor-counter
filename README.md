@@ -33,6 +33,15 @@ About $0 at portfolio traffic. Lambda and DynamoDB fall within AWS always-free l
 - **Atomic `ADD` update:** no read-then-write race condition when two visitors arrive at once
 - **Terraform + `archive_file`:** the Lambda zip is built and deployed in one `terraform apply`
 
+## CI/CD
+
+Every change is deployed by **GitHub Actions** using **OIDC** (temporary AWS credentials, no stored keys):
+
+- **Pull request:** format check, validate, `terraform plan`
+- **Push to main:** plan, `terraform apply`, then a smoke test that calls the live API
+
+State lives in a versioned, encrypted S3 bucket with DynamoDB locking. The deploy role can only manage this project's own resources. See [aws-cicd-oidc-bootstrap](https://github.com/morcosfady/aws-cicd-oidc-bootstrap).
+
 ## Usage
 
 ```bash

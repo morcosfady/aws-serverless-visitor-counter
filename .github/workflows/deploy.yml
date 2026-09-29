@@ -1,0 +1,53 @@
+name: Terraform deploy
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # needed to request the OIDC token
+  contents: read
+
+concurrency:
+  group: terraform
+  cancel-in-progress: false
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to AWS with OIDC (no stored keys)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::202373502652:role/github-actions-visitor-counter
+          aws-region: us-east-1
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Format check
+        run: terraform fmt -check -recursive
+
+      - name: Init
+        run: terraform init -input=false
+
+      - name: Validate
+        run: terraform validate
+
+      - name: Plan
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Apply (main branch only)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: terraform apply -input=false tfplan
+
+      - name: Smoke test the live API
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          URL=$(terraform output -raw api_url)
+          echo "Testing $URL"
+          curl -fsS -H "Origin: https://morcosfady.github.io" "$URL"
