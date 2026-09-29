@@ -33,6 +33,16 @@ About $0 at portfolio traffic. Lambda and DynamoDB fall within AWS always-free l
 - **Atomic `ADD` update:** no read-then-write race condition when two visitors arrive at once
 - **Terraform + `archive_file`:** the Lambda zip is built and deployed in one `terraform apply`
 
+## Observability and cost guardrails
+
+| What | Details |
+|------|---------|
+| **CloudWatch dashboard** | Requests, 4xx/5xx, p50/p90 latency, Lambda invocations/errors/throttles/duration, DynamoDB writes, alarm status |
+| **4 alarms -> SNS email** | Lambda errors, API 5xx, p90 latency > 1s for 10 min, Lambda throttles (with recovery "OK" emails) |
+| **AWS Budget (as code)** | $5/month guardrail: email at 20% actual spend and at 100% forecasted |
+
+All within AWS always-free limits. Alarm notifications are tested with `aws cloudwatch set-alarm-state`.
+
 ## CI/CD
 
 Every change is deployed by **GitHub Actions** using **OIDC** (temporary AWS credentials, no stored keys):

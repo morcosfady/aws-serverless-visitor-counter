@@ -8,3 +8,9 @@ variable "allowed_origin" {
   type        = string
   default     = "https://morcosfady.github.io"
 }
+
+variable "alert_email" {
+  description = "Where alarms and budget alerts go (already public on my portfolio's contact section)"
+  type        = string
+  default     = "morcos.fady94@gmail.com"
+}
